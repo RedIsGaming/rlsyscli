@@ -50,9 +50,17 @@ public class Program
   private static float DiskSpace(float space)
   {
     var diskSpace= (space + 0.0f) / Bytes / Bytes / Bytes;
-    var preciseSpace= float.Round(diskSpace, 2, MidpointRounding.AwayFromZero);
+    var preciseSpace= float.Round(diskSpace, 2);
     
     return preciseSpace;
+  }
+
+  private static float DiskSpacePercentage(float totalSpace, float space)
+  {
+    var diskSpace= (space + 0.0f) / Bytes / Bytes / Bytes;
+    var preciseSpace= float.Round(diskSpace, 2);
+    
+    return float.Round(100 / DiskSpace(totalSpace) * preciseSpace, 2);
   }
   
   public static void Main()
@@ -103,11 +111,17 @@ public class Program
         DiskSpace(volume.UsedSpace),
         DiskSpace(volume.FreeSpace)
       };
+
+      var diskSpacePercentage = new List<float>
+      {
+        DiskSpacePercentage(driveInfo.TotalSize, volume.UsedSpace),
+        DiskSpacePercentage(driveInfo.TotalSize, volume.FreeSpace)
+      };
       
       var row = String.Format("" + 
         "| {0,6} | {1,8}GB | {2,8}GB | {3,17}% | {4,8}GB | {5,17}% |", 
         driveInfo.VolumeLabel, diskSpace[0], diskSpace[1],
-        diskSpace[1], diskSpace[2], diskSpace[2]
+        diskSpacePercentage[0], diskSpace[2], diskSpacePercentage[1]
       );
       
       Console.WriteLine(lines);
