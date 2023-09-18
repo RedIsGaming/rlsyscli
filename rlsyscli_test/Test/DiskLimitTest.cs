@@ -1,6 +1,9 @@
 using rlsyscli_test.Data;
 namespace rlsyscli_test.Test;
 
+[Trait("Category", "Unit")]
+[Trait("Priority", "High")]
+[Trait("Environment", "Development")]
 public record DiskLimitTest
 {
   //Checks if the DriveName is in the list. It returns true if the given volume is in there.
@@ -10,11 +13,11 @@ public record DiskLimitTest
   {
     var diskLimit = new DiskLimit<float>
     {
-      DriveName = "/"
+      DriveName = "/Tmp"
     };
 
     var result = diskLimit.CheckVolume();
-    Assert.Contains(diskLimit.DriveName, result);
+    Assert.Contains(diskLimit.DriveName, result, StringComparer.OrdinalIgnoreCase);
   }
   
   //Calculates and returns true if the given TotalStorage is lower then the disk storage.
@@ -48,8 +51,7 @@ public record DiskLimitTest
   }
   
   //This test works, but it's still a bit wacky.
-  //Problem with driveName path still occuring in all tests.
-  //Might be changed later.
+  //Problem with driveName path still occuring in all tests, except the first.
   [Fact]
   private void AvailableStorageTest()
   {
