@@ -1,15 +1,17 @@
-﻿using rlsyscli.DiskVolume;
+﻿using System.Data;
+using rlsyscli.DiskVolume;
 namespace rlsyscli;
 
 public class Program
 {
-  private static Volume<string> VolumePath()
+  private const ushort Bytes = 1024;
+  private static Volume<string, float> VolumePath()
   {
-    Volume<string> volume = new();
+    Volume<string, float> volume = new();
     
     try
     {
-      volume = new()
+      volume = new Volume<string, float>
       {
         Path = new List<string>
         {
@@ -28,7 +30,7 @@ public class Program
 
     catch (DriveNotFoundException e)
     {
-      Console.WriteLine("Drive not found \n" + e.Message);
+      Console.WriteLine("Drive not found" + e.Message + "\n");
     }
 
     return volume;
@@ -44,19 +46,74 @@ public class Program
 
     return volumePath;
   }
+
+  private static float DiskSpace(float space)
+  {
+    var diskSpace= (space + 0.0f) / Bytes / Bytes / Bytes;
+    var preciseSpace= float.Round(diskSpace, 2, MidpointRounding.AwayFromZero);
+    
+    return preciseSpace;
+  }
   
   public static void Main()
   {
-    const ushort bytes = 1024;
+    const string lines = "+--------+------------+------------+--------------------+------------+--------------------+";
+    var dataTable = new DataTable();
+    
+    var columns = new List<string> {
+      "Volume",
+      "Total size",
+      "Used space",
+      "Percent used space",
+      "Free space",
+      "Percent free space"
+    };
+    
+    foreach (var args in columns)
+    {
+      dataTable.Columns.Add(args);
+    }
+    
+    Console.WriteLine(lines);
+    
+    foreach (var args in dataTable.Columns)
+    {
+      var column = String.Format("| {0,6} ", args);
+      Console.Write(column);
+      
+      if (args == dataTable.Columns[^1])
+      {
+        Console.WriteLine("|");
+      }
+    }
     
     foreach (var path in FilterPath())
     {
       var driveInfo = new DriveInfo(path);
-      var drive = (driveInfo.TotalSize + 0.0f) / bytes / bytes / bytes;
-      var filter = float.Round(drive, 2, MidpointRounding.AwayFromZero);
+      var volume = new Volume<string, float>
+      {
+        TotalSize = driveInfo.TotalSize,
+        UsedSpace = driveInfo.AvailableFreeSpace,
+        FreeSpace = driveInfo.TotalSize - driveInfo.AvailableFreeSpace
+      };
+
+      var diskSpace = new List<float>
+      {
+        DiskSpace(volume.TotalSize),
+        DiskSpace(volume.UsedSpace),
+        DiskSpace(volume.FreeSpace)
+      };
       
-      Console.WriteLine("Volume | Size");
-      Console.WriteLine(path + " " + filter + " GB");
+      var row = String.Format("" + 
+        "| {0,6} | {1,8}GB | {2,8}GB | {3,17}% | {4,8}GB | {5,17}% |", 
+        driveInfo.VolumeLabel, diskSpace[0], diskSpace[1],
+        diskSpace[1], diskSpace[2], diskSpace[2]
+      );
+      
+      Console.WriteLine(lines);
+      Console.WriteLine(row);
     }
+    
+    Console.WriteLine(lines);
   }
 }
