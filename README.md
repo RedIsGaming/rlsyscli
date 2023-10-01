@@ -12,20 +12,33 @@ A utility tool to show your disk usage as well as your CPU/RAM and process usage
 You can clone this project anywhere on your PC. 
 To make this project work, follow the steps below: <br/>
 ```shell
-#step 1
+# Step 1
 git clone https://github.com/RedIsGaming/rlsyscli.git
 OR
 git clone git@github.com:RedIsGaming/rlsyscli.git
 
-#step 2
+# This step only works from where rlsyscli is cloned to.
+# Step 2
 cd rlsyscli
 
-#step 3
-source "path/rlsyscli/disk.sh" #Where path is the location of your directory.
+<<mlc The following step works only in the current shell/prompt/console/terminal.
+The location doesn't really matter though.
+mlc
 
-#step 4
+# Step 3 (Linux)
+source "path/rlsyscli/disk.sh" # Where path is the location of your directory
+# Example source "$HOME/Desktop/projects/rlsyscli/disk.sh"
+
+#Step 3 (Windows)
+
+#Example
+
+# Step 4
 sysdisk
 ```
+
+## Sysdisk
+![Sysdisk table Image](Assets/Sysdisk.png)
 
 ## Status
 > On going

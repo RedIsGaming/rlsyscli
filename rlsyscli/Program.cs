@@ -1,44 +1,40 @@
-﻿using System.Data;
+﻿using ConsoleTables;
 using rlsyscli.Disk;
-using rlsyscli.Table;
 namespace rlsyscli;
 
 public class Program
 {
-  //An object for using the table.
-  private static TableView<string> tableView = new()
+  private static Table<ConsoleTable> table = new()
   {
-    DataTables = new DataTable(),
-    Lines = "+----------------+----------+----------+----------+----------+----------+"
+    CreateTable = new ConsoleTable(
+      "Volume path", "Total space", "Used space",
+      "Free space", "Percent used space", "Percent used free"
+    )
   };
   
-  //A method to print the disks.
-  private static void PrintDrive(DriveInfo path, List<double> diskSpace, List<double> diskPercentage)
+  private static void FillRow(DriveInfo path, List<double> diskSpace, List<double> diskPercentage)
   {
-    var row = String.Format("| {0,14} | {1,6}GB | {2,6}GB | {3,6}GB | {4,7}% | {5,7}% |",
-      path.Name,
-      diskSpace[0], 
-      diskSpace[1], 
-      diskSpace[2], 
-      diskPercentage[0], 
-      diskPercentage[1]
+    table.CreateTable.AddRow(
+      path.Name, diskSpace[0] + String.Join("", "GB"), 
+      diskSpace[1] + String.Join("", "GB"), diskSpace[2] + String.Join("", "GB"), 
+      diskPercentage[0] + String.Join("", "%"), diskPercentage[1] + String.Join("", "%")
     );
+  }
 
-    Console.WriteLine($"{tableView.Lines}\n{row}");
+  private static void WriteTable()
+  {
+    table.CreateTable.Write(Format.Alternative);
   }
   
-  //A method to get the disk storage calculated in GB.
   private static List<double> GetDiskSpace(Space<double> space, Volume<double> volume)
   {
     return new List<double>
     {
-      space.DiskSpace(volume.TotalSize),
-      space.DiskSpace(volume.UsedSpace),
+      space.DiskSpace(volume.TotalSize), space.DiskSpace(volume.UsedSpace),
       space.DiskSpace(volume.FreeSpace)
     };
   }
   
-  //A method to get the disk storage calculated in %.
   private static List<double> GetDiskPercentage(Space<double> space, Volume<double> volume)
   {
     return new List<double>
@@ -48,7 +44,6 @@ public class Program
     };
   }
   
-  //A method to get the disk spaces in GB and %.
   private static void FilterDisk(List<DriveInfo> driveInfo, Space<double> space)
   {
     foreach (var args in driveInfo)
@@ -63,8 +58,8 @@ public class Program
             UsedSpace = args.AvailableFreeSpace,
             FreeSpace = args.TotalSize - args.AvailableFreeSpace
           };
-
-          PrintDrive(args, GetDiskSpace(space, volume), GetDiskPercentage(space, volume));
+          
+          FillRow(args, GetDiskSpace(space, volume), GetDiskPercentage(space, volume));
         }
       }
 
@@ -72,7 +67,6 @@ public class Program
     }
   }
   
-  //A method to get all the current drives that are in use and those that can be shown.
   private static void RetrieveDisk()
   {
     try
@@ -93,11 +87,9 @@ public class Program
     }
   }
   
-  //The main application
   public static void Main()
   {
-    tableView.WriteColumn();
     RetrieveDisk();
-    Console.WriteLine(tableView.Lines);
+    WriteTable();
   }
 }
