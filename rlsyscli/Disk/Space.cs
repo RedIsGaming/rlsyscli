@@ -28,6 +28,6 @@ where T : INumber<T>
       return (T) Convert.ChangeType(0.00, typeof(T));
     }
     
-    return (T) Convert.ChangeType(double.Round(diskPercentage, 2), typeof(T));
+    return (T) Convert.ChangeType(double.Round(diskPercentage, 3), typeof(T));
   }
 }

@@ -13,7 +13,7 @@ where T : IConvertible
   {
     var columns = new List<string>
     {
-      "All Volume path",
+      "On Volume path",
       "Total",
       "Used",
       "Free",
@@ -41,7 +41,7 @@ where T : IConvertible
     
     foreach (var args in DataTables.Columns)
     {
-      var column = String.Format("| {0,7} ", args);
+      var column = String.Format("| {0,8} ", args);
       Console.Write(column);
       
       if (args == DataTables.Columns[^1])

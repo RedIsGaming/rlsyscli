@@ -9,13 +9,13 @@ public class Program
   private static TableView<string> tableView = new()
   {
     DataTables = new DataTable(),
-    Lines = "+----------------+----------+----------+----------+--------+--------+"
+    Lines = "+----------------+----------+----------+----------+----------+----------+"
   };
   
   //A method to print the disks.
   private static void PrintDrive(DriveInfo path, List<double> diskSpace, List<double> diskPercentage)
   {
-    var row = String.Format("| {0,14} | {1,6}GB | {2,6}GB | {3,6}GB | {4,5}% | {5,5}% |",
+    var row = String.Format("| {0,14} | {1,6}GB | {2,6}GB | {3,6}GB | {4,7}% | {5,7}% |",
       path.Name,
       diskSpace[0], 
       diskSpace[1], 
