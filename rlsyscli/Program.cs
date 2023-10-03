@@ -4,34 +4,26 @@ namespace rlsyscli;
 
 public class Program
 {
-  private static Table<ConsoleTable> table = new()
+  private static readonly Table<ConsoleTable> Table = new()
   {
     CreateTable = new ConsoleTable(
-      "Volume path", "Total space", "Used space",
-      "Free space", "Percent used space", "Percent used free"
+      "Volume path", "Total space", "Used space", "Free space", "Percent used space", "Percent free space"
     )
   };
   
-  private static void FillRow(DriveInfo path, List<double> diskSpace, List<double> diskPercentage)
+  private static void FillRow(DriveInfo path, IReadOnlyList<double> diskSpace, IReadOnlyList<double> diskPercentage)
   {
-    table.CreateTable.AddRow(
-      path.Name, diskSpace[0] + String.Join("", "GB"), 
-      diskSpace[1] + String.Join("", "GB"), diskSpace[2] + String.Join("", "GB"), 
-      diskPercentage[0] + String.Join("", "%"), diskPercentage[1] + String.Join("", "%")
+    Table.CreateTable.AddRow(path.Name, string.Format("{0:F2}GB", diskSpace[0]), 
+      string.Format("{0:F2}GB", diskSpace[1]), string.Format("{0:F2}GB", diskSpace[2]), 
+      string.Format("{0:F2}%", diskPercentage[0]), string.Format("{0:F2}%", diskPercentage[1])
     );
-  }
-
-  private static void WriteTable()
-  {
-    table.CreateTable.Write(Format.Alternative);
   }
   
   private static List<double> GetDiskSpace(Space<double> space, Volume<double> volume)
   {
     return new List<double>
     {
-      space.DiskSpace(volume.TotalSize), space.DiskSpace(volume.UsedSpace),
-      space.DiskSpace(volume.FreeSpace)
+      space.DiskSpace(volume.TotalSize), space.DiskSpace(volume.UsedSpace), space.DiskSpace(volume.FreeSpace)
     };
   }
   
@@ -39,7 +31,7 @@ public class Program
   {
     return new List<double>
     {
-      space.DiskPercentage(volume.TotalSize, volume.UsedSpace),
+      space.DiskPercentage(volume.TotalSize, volume.UsedSpace), 
       space.DiskPercentage(volume.TotalSize, volume.FreeSpace)
     };
   }
@@ -73,7 +65,19 @@ public class Program
     {
       var driveInfo = DriveInfo.GetDrives()
         .Where(d => d.IsReady)
-        .OrderBy(d => d.Name)
+        .Where(d =>
+        {
+          try
+          {
+            var _ = d.TotalSize;
+            return true;
+          }
+          catch (UnauthorizedAccessException)
+          {
+            return false;
+          }
+        })
+        .OrderByDescending(d => d.TotalSize)
         .Distinct()
         .ToList();
       
@@ -90,6 +94,6 @@ public class Program
   public static void Main()
   {
     RetrieveDisk();
-    WriteTable();
+    Table.CreateTable.Write(Format.Alternative);
   }
 }
