@@ -18,10 +18,10 @@ where T : INumber<T>
   
   public T DiskPercentage(double fullSpace, double space)
   {
-    var percent = 100.0f;
+    const float percent = 100.0f;
     var diskPercentage = percent / Disk<double>(fullSpace) * Disk<double>(space);
 
-    if (Double.IsNaN(diskPercentage))
+    if (double.IsNaN(diskPercentage))
     {
       return (T) Convert.ChangeType(percent - 100, typeof(T));
     }

@@ -13,9 +13,8 @@ public class Program
   
   private static void FillRow(DriveInfo path, IReadOnlyList<double> diskSpace, IReadOnlyList<double> diskPercentage)
   {
-    Table.CreateTable.AddRow(path.Name, string.Format("{0:F2}GB", diskSpace[0]), 
-      string.Format("{0:F2}GB", diskSpace[1]), string.Format("{0:F2}GB", diskSpace[2]), 
-      string.Format("{0:F2}%", diskPercentage[0]), string.Format("{0:F2}%", diskPercentage[1])
+    Table.CreateTable.AddRow(path.Name, $"{diskSpace[0]:F2}GB", $"{diskSpace[1]:F2}GB", $"{diskSpace[2]:F2}GB",
+      $"{diskPercentage[0]:F2}%", $"{diskPercentage[1]:F2}%"
     );
   }
   
@@ -42,17 +41,16 @@ public class Program
     {
       try
       {
-        if (args.AvailableFreeSpace > 0.00)
+        if (args.AvailableFreeSpace < 0.00)  { continue; }
+
+        var volume = new Volume<double>
         {
-          var volume = new Volume<double>
-          {
-            TotalSize = args.TotalSize,
-            UsedSpace = args.AvailableFreeSpace,
-            FreeSpace = args.TotalSize - args.AvailableFreeSpace
-          };
+          TotalSize = args.TotalSize,
+          UsedSpace = args.AvailableFreeSpace, 
+          FreeSpace = args.TotalSize - args.AvailableFreeSpace
+        };
           
-          FillRow(args, GetDiskSpace(space, volume), GetDiskPercentage(space, volume));
-        }
+        FillRow(args, GetDiskSpace(space, volume), GetDiskPercentage(space, volume));
       }
 
       catch (UnauthorizedAccessException) {}
