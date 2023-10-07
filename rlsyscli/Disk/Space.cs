@@ -6,8 +6,7 @@ where T : INumber<T>
 {
   private T Disk<T>(double space)
   {
-    const ushort bytes = 1024;
-    var diskSpace = space / Math.Pow(bytes, 3);
+    var diskSpace = space / Math.Pow(1024, 3);
     return (T) Convert.ChangeType(double.Round(diskSpace, 2), typeof(T));
   }
   
@@ -18,12 +17,12 @@ where T : INumber<T>
   
   public T DiskPercentage(double fullSpace, double space)
   {
-    const float percent = 100.0f;
+    const byte percent = 100;
     var diskPercentage = percent / Disk<double>(fullSpace) * Disk<double>(space);
 
     if (double.IsNaN(diskPercentage))
     {
-      return (T) Convert.ChangeType(percent - 100, typeof(T));
+      return (T) Convert.ChangeType(percent - percent, typeof(T));
     }
     
     return (T) Convert.ChangeType(double.Round(diskPercentage, 2), typeof(T));

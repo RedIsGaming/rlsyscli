@@ -11,29 +11,21 @@ public class Program
     )
   };
   
-  private static void FillRow(DriveInfo path, IReadOnlyList<double> diskSpace, IReadOnlyList<double> diskPercentage)
-  {
-    Table.CreateTable.AddRow(path.Name, $"{diskSpace[0]:F2}GB", $"{diskSpace[1]:F2}GB", $"{diskSpace[2]:F2}GB",
-      $"{diskPercentage[0]:F2}%", $"{diskPercentage[1]:F2}%"
-    );
-  }
+  private static void FillRow(DriveInfo path, IReadOnlyList<double> diskSpace, IReadOnlyList<double> diskPercentage) => 
+  Table.CreateTable.AddRow(path.Name, $"{diskSpace[0]:F2}GB", 
+    $"{diskSpace[1]:F2}GB", $"{diskSpace[2]:F2}GB", $"{diskPercentage[0]:F2}%", $"{diskPercentage[1]:F2}%"
+  );
   
-  private static List<double> GetDiskSpace(Space<double> space, Volume<double> volume)
+  private static List<double> GetDiskSpace(Space<double> space, Volume<double> volume) => new()
   {
-    return new List<double>
-    {
-      space.DiskSpace(volume.TotalSize), space.DiskSpace(volume.UsedSpace), space.DiskSpace(volume.FreeSpace)
-    };
-  }
+    space.DiskSpace(volume.TotalSize), space.DiskSpace(volume.UsedSpace), space.DiskSpace(volume.FreeSpace)
+  };
   
-  private static List<double> GetDiskPercentage(Space<double> space, Volume<double> volume)
+  private static List<double> GetDiskPercentage(Space<double> space, Volume<double> volume) => new()
   {
-    return new List<double>
-    {
-      space.DiskPercentage(volume.TotalSize, volume.UsedSpace), 
-      space.DiskPercentage(volume.TotalSize, volume.FreeSpace)
-    };
-  }
+    space.DiskPercentage(volume.TotalSize, volume.UsedSpace), 
+    space.DiskPercentage(volume.TotalSize, volume.FreeSpace)
+  };
   
   private static void FilterDisk(List<DriveInfo> driveInfo, Space<double> space)
   {
@@ -41,15 +33,18 @@ public class Program
     {
       try
       {
-        if (args.AvailableFreeSpace < 0.00)  { continue; }
+        if (args.AvailableFreeSpace <= 0.00)
+        {
+          continue;
+        }
 
         var volume = new Volume<double>
         {
           TotalSize = args.TotalSize,
-          UsedSpace = args.AvailableFreeSpace, 
+          UsedSpace = args.AvailableFreeSpace,
           FreeSpace = args.TotalSize - args.AvailableFreeSpace
         };
-          
+
         FillRow(args, GetDiskSpace(space, volume), GetDiskPercentage(space, volume));
       }
 
@@ -67,9 +62,10 @@ public class Program
         {
           try
           {
-            var _ = d.TotalSize;
+            var totalSize = d.TotalSize;
             return true;
           }
+          
           catch (UnauthorizedAccessException)
           {
             return false;
